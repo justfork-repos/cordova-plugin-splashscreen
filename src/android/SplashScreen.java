@@ -314,7 +314,7 @@ public class SplashScreen extends CordovaPlugin {
                 }
 
                 // Create and show the dialog
-                final String resourceName = preferences.getString("androidStyleResource", "");
+                final String resourceName = preferences.getString("SplashAndroidStyleResource", "");
                 final Activity activity = cordova.getActivity();
                 if (!resourceName.equals("")) {
                     splashDialog = new Dialog(context, activity.getResources().getIdentifier(resourceName, "style", context.getPackageName()));
