@@ -19,6 +19,7 @@
 
 package org.apache.cordova.splashscreen;
 
+import android.app.Activity;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -313,9 +314,16 @@ public class SplashScreen extends CordovaPlugin {
                 }
 
                 // Create and show the dialog
-                splashDialog = new Dialog(context, android.R.style.Theme_Translucent_NoTitleBar);
+                final String resourceName = preferences.getString("androidStyleResource", "");
+                final Activity activity = cordova.getActivity();
+                if (!resourceName.equals("")) {
+                    splashDialog = new Dialog(context, activity.getResources().getIdentifier(resourceName, "style", context.getPackageName()));
+                } else {
+                    splashDialog = new Dialog(context, android.R.style.Theme_Translucent_NoTitleBar);
+                }
+
                 // check to see if the splash screen should be full screen
-                if ((cordova.getActivity().getWindow().getAttributes().flags & WindowManager.LayoutParams.FLAG_FULLSCREEN)
+                if ((activity.getWindow().getAttributes().flags & WindowManager.LayoutParams.FLAG_FULLSCREEN)
                         == WindowManager.LayoutParams.FLAG_FULLSCREEN) {
                     splashDialog.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                             WindowManager.LayoutParams.FLAG_FULLSCREEN);
