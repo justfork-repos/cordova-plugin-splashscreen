@@ -174,6 +174,7 @@
     // this is appropriate for detecting the runtime screen environment
     device.iPhone6 = (device.iPhone && limit == 667.0);
     device.iPhone6Plus = (device.iPhone && limit == 736.0);
+    device.iPhoneX = (device.iPhone && limit == 812);
 
     return device;
 }
@@ -228,7 +229,9 @@
             {
                 imageName = [imageName stringByAppendingString:@"-Portrait"];
             }
-        }
+        } else if (device.iPhoneX) {
+          imageName = [imageName stringByAppendingString:@"-1100"];
+    	}
     }
 
     if (device.iPhone5)
@@ -259,6 +262,23 @@
         }
         imageName = [imageName stringByAppendingString:@"-736h"];
 
+    }
+    else if (device.iPhoneX) {
+        //support landscape
+        if (isOrientationLocked) {
+            imageName = [imageName stringByAppendingString:(supportsLandscape ? @"-Landscape" : @"-Portrait")];
+        } else {
+            switch (currentOrientation) {
+                case UIInterfaceOrientationLandscapeLeft:
+                case UIInterfaceOrientationLandscapeRight:
+                	imageName = [imageName stringByAppendingString:@"-Landscape"];
+                	break;
+                default:
+                	imageName = [imageName stringByAppendingString:@"-Portrait"];
+                break;
+            }
+        }
+        imageName = [imageName stringByAppendingString:@"-2436h"];
     }
     else if (device.iPad)
     {   // supports landscape
@@ -352,9 +372,17 @@
     if ([self isUsingCDVLaunchScreen]) {
         // CB-9762's launch screen expects the image to fill the screen and be scaled using AspectFill.
         CGSize viewportSize = [UIApplication sharedApplication].delegate.window.bounds.size;
-        _imageView.frame = CGRectMake(0, 0, viewportSize.width, viewportSize.height);
+        //_imageView.frame = CGRectMake(0, 0, viewportSize.width, viewportSize.height);
+        CGFloat imageHeight = viewportSize.height;
+        
+        // make LaunchStoryBoard bottom space constrait work with IOS 11 safe areas$
+        if (@available(iOS 11.0, *)) {
+            UIEdgeInsets safeAreaInsets = [UIApplication sharedApplication].delegate.window.safeAreaInsets;
+            imageHeight -= safeAreaInsets.bottom;
+        }
+        _imageView.frame = CGRectMake(0, 0, viewportSize.width, imageHeight);
         _imageView.contentMode = UIViewContentModeScaleAspectFill;
-        return; 
+        return;
     }
 
     UIImage* img = _imageView.image;
